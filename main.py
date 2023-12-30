@@ -115,7 +115,8 @@ with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2,
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         faceresult = face_detector.detect_face(frame_rgb)
         handresult = hand.process(frame_rgb)
-
+        x2 = WIDTH / 2 - 60
+        x1 = WIDTH / 2 + 60
         if handresult.multi_hand_landmarks:
             for i, handLandmark in enumerate(handresult.multi_hand_landmarks):
                 for j in range(len(handLandmark.landmark)):
@@ -138,7 +139,8 @@ with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2,
 
                 if handresult.multi_handedness[i].classification[0].label == "Right":
                     # Right Hand
-                    x2 = WIDTH / 2 - 60
+
+                    hand_coordinates[0].center = (x1, main_bird.rect.centery)  # prev_hand_left
                     hand_coordinates[1].center = (x2, main_bird.rect.centery)
 
                     angle = redefine_angle(calculate_angle(
@@ -156,7 +158,7 @@ with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2,
                             bullet_timer = current_time
                 else:
                     # Left Hand
-                    x1 = WIDTH / 2 + 60
+                    hand_coordinates[1].center = (x2, main_bird.rect.centery)  # prev_hand_right
                     hand_coordinates[0].center = (x1, main_bird.rect.centery)
 
                     angle2 = redefine_angle(calculate_angle(
@@ -174,8 +176,8 @@ with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2,
 
         else:
             # If no hand is detected, use the previous hand positions
-            hand_coordinates[0].center = (0, 0)  # prev_hand_left
-            hand_coordinates[1].center = (0, 0)  # prev_hand_right
+            hand_coordinates[0].center = (x1, main_bird.rect.centery)  # prev_hand_left
+            hand_coordinates[1].center = (x2, main_bird.rect.centery)  # prev_hand_right
 
         left_eye_landmark, right_eye_landmark = face_detector.draw_face_landmarks(frame_rgb,
                                                                                   faceresult)  # return point of left_eye and righteye
