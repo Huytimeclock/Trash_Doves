@@ -10,6 +10,7 @@ from virus import Virus
 from bullet import Bullet  # Import the Bullet class
 from face import FaceDetector
 from hand import calculate_angle, rotate_image, redefine_angle  # Import hand-related functions
+from pipe import Pipe
 
 # initialize pygame
 pygame.init()
@@ -49,7 +50,7 @@ rotated_image_right, new_rect_right = None, None
 viruses = pygame.sprite.Group()
 # Define a variable to store the time when the last virus was added
 last_virus_time = time.time()
-
+last_pipe_time=time.time()
 # Creating the bird
 main_bird = Bird(position=(WIDTH // 2, HEIGHT // 2), jump_speed=-10, gravity=1, initial_speed=0)
 
@@ -85,13 +86,20 @@ height_trigger_bird_jump = 5
 center_point_before = None
 center_point_time_before = None
 
+pipes = pygame.sprite.Group()
+
+# Initialize a Pipe instance
+pipe_speed = 8  # Adjust speed as needed
+max_top_y_pipe=-950
+min_top_y_pipe=-1350
+
 # gameloop-------------------------------------------------------------------------------------------------------------
 working = True
 with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2, max_num_hands=2) as hand:
     while working:
         current_time = time.time()
         virus_spawn_time = 2  # Virus spawn
-
+        pipe_spawn_time = 8
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 working = False
@@ -107,8 +115,20 @@ with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2,
             viruses.add(new_virus)
             last_virus_time = current_time
 
+        # Create new pipes
+        pipe_top_y_value=random.randint(min_top_y_pipe,max_top_y_pipe)
+        lr_value=random.randint(1,2)
+        if current_time - last_pipe_time > pipe_spawn_time:
+            new_pipe = Pipe(WIDTH, HEIGHT, pipe_speed,1,pipe_top_y_value,lr_value)
+            pipes.add(new_pipe)
+            new_pipe = Pipe(WIDTH, HEIGHT, pipe_speed, 2,pipe_top_y_value+1000,lr_value)
+            pipes.add(new_pipe)
+            print(pipe_top_y_value)
+            last_pipe_time = current_time
+
         main_bird.update()
         viruses.update()
+        pipes.update()
 
         # ------------------------ OPENCV OPERATION
         control, frame = webcam.read()
@@ -221,7 +241,8 @@ with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2,
 
         # Draw viruses
         viruses.draw(window)
-
+        # Draw pipes
+        pipes.draw(window)
         # Update viruses and check for reset and creation
         viruses.update()
         # Update bullets
