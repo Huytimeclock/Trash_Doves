@@ -3,7 +3,7 @@ import random
 import math
 
 class Virus(pygame.sprite.Sprite):
-    def __init__(self, width, height, scale_factor=5.0):
+    def __init__(self, width, height, scale_factor=4.0):
         super().__init__()
         # Initialize virus attributes
         original_frames = [pygame.image.load(f"BatMove{i}.png") for i in range(1, 7)]

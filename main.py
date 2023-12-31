@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import random
 import time
+import pygame.gfxdraw
 import math
 from bird import Bird
 from virus import Virus
@@ -32,6 +33,7 @@ face_detector = FaceDetector()
 pygame.mixer.music.load("bg-music.wav")
 pygame.mixer.music.play(-1, 0, 0)
 destroying_virus = pygame.mixer.Sound("collect.wav")
+deathsound=pygame.mixer.Sound("death.wav")
 
 # adding main characters and virus
 hand_left = pygame.image.load("hand_right.png")
@@ -56,6 +58,9 @@ main_bird = Bird(position=(WIDTH // 2, HEIGHT // 2), jump_speed=-10, gravity=1, 
 
 # Create default font
 default_font = pygame.font.Font(pygame.font.get_default_font(), 36)
+# Load a different font for prettier text
+button_font = pygame.font.Font("Poppins-Light.ttf", 30)
+
 
 # Create a surface for the camera feed
 camera_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
@@ -95,6 +100,10 @@ min_top_y_pipe=-1350
 
 # Define a game over flag
 game_over = False
+# Initialize the game over screen variables
+game_over_bg = None
+game_over_sound_played = False
+game_over_start_time = None
 # gameloop-------------------------------------------------------------------------------------------------------------
 working = True
 with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2, max_num_hands=2) as hand:
@@ -131,6 +140,9 @@ with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2,
         main_bird.update()
         viruses.update()
         pipes.update()
+
+
+
 
         # ------------------------ OPENCV OPERATION
         control, frame = webcam.read()
@@ -269,12 +281,90 @@ with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2,
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = False
+                working = False  # Added to handle quitting the game correctly
 
-        window.fill((255, 255, 255))  # Clear the window
-        # Display game over text
-        game_over_text = default_font.render("Game Over", True, (255, 0, 0))
-        text_rect = game_over_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        # Play the game over sound only once
+        if not game_over_sound_played:
+            deathsound.play()
+            game_over_sound_played = True
+            game_over_start_time = current_time
+
+        # Drawing Rectangle
+        pygame.draw.rect(window, (255,255,255), pygame.Rect(WIDTH // 3 * 2-150, HEIGHT // 2-150, 300, 400))
+
+        # Display game over text with a different font
+        game_over_text = button_font.render("Game Over", True, (255, 0, 0))
+        text_rect = game_over_text.get_rect(center=(WIDTH // 3 * 2, HEIGHT // 2 - 50))
         window.blit(game_over_text, text_rect)
+
+        # Display the score
+        score_text = button_font.render("Score: " + str(SCORE), True, (0, 0, 0))
+        score_rect = score_text.get_rect(center=(WIDTH // 3 * 2, HEIGHT // 2))
+        window.blit(score_text, score_rect)
+
+        # Display buttons with anti-aliased shapes
+        button_color = (100, 100, 100)
+        play_again_rect = pygame.Rect(WIDTH // 3 * 2 - 75, HEIGHT // 2 + 25, 150, 40)
+        pygame.gfxdraw.aapolygon(window, [(play_again_rect.left, play_again_rect.top),
+                                          (play_again_rect.right, play_again_rect.top),
+                                          (play_again_rect.right, play_again_rect.bottom),
+                                          (play_again_rect.left, play_again_rect.bottom)], button_color)
+        pygame.gfxdraw.filled_polygon(window, [(play_again_rect.left, play_again_rect.top),
+                                               (play_again_rect.right, play_again_rect.top),
+                                               (play_again_rect.right, play_again_rect.bottom),
+                                               (play_again_rect.left, play_again_rect.bottom)], button_color)
+        play_again_text = button_font.render("Play Again", True, (255, 255, 255))
+        text_rect = play_again_text.get_rect(center=play_again_rect.center)
+        window.blit(play_again_text, text_rect)
+
+        back_to_menu_rect = pygame.Rect(WIDTH // 3 * 2 - 75, HEIGHT // 2 + 75, 150, 40)
+        pygame.gfxdraw.aapolygon(window, [(back_to_menu_rect.left, back_to_menu_rect.top),
+                                          (back_to_menu_rect.right, back_to_menu_rect.top),
+                                          (back_to_menu_rect.right, back_to_menu_rect.bottom),
+                                          (back_to_menu_rect.left, back_to_menu_rect.bottom)], button_color)
+        pygame.gfxdraw.filled_polygon(window, [(back_to_menu_rect.left, back_to_menu_rect.top),
+                                               (back_to_menu_rect.right, back_to_menu_rect.top),
+                                               (back_to_menu_rect.right, back_to_menu_rect.bottom),
+                                               (back_to_menu_rect.left, back_to_menu_rect.bottom)], button_color)
+        back_to_menu_text = button_font.render("Back to Menu", True, (255, 255, 255))
+        text_rect = back_to_menu_text.get_rect(center=back_to_menu_rect.center)
+        window.blit(back_to_menu_text, text_rect)
+
+        quit_rect = pygame.Rect(WIDTH // 3 * 2 - 75, HEIGHT // 2 + 125, 150, 40)
+        pygame.gfxdraw.aapolygon(window, [(quit_rect.left, quit_rect.top),
+                                          (quit_rect.right, quit_rect.top),
+                                          (quit_rect.right, quit_rect.bottom),
+                                          (quit_rect.left, quit_rect.bottom)], button_color)
+        pygame.gfxdraw.filled_polygon(window, [(quit_rect.left, quit_rect.top),
+                                               (quit_rect.right, quit_rect.top),
+                                               (quit_rect.right, quit_rect.bottom),
+                                               (quit_rect.left, quit_rect.bottom)], button_color)
+        quit_text = button_font.render("Quit", True, (255, 255, 255))
+        text_rect = quit_text.get_rect(center=quit_rect.center)
+        window.blit(quit_text, text_rect)
+
         pygame.display.update()
+
+        # Check for button clicks
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        mouse_click = pygame.mouse.get_pressed()
+
+        if play_again_rect.collidepoint(mouse_x, mouse_y) and mouse_click[0] == 1:
+            # Reset game state
+            main_bird.rect.center = (WIDTH // 2, HEIGHT // 2)
+            main_bird.y_speed = 0
+            viruses.empty()
+            bullets.empty()
+            SCORE = 0
+            game_over = False
+            game_over_sound_played = False
+            game_over_start_time = None
+
+        elif back_to_menu_rect.collidepoint(mouse_x, mouse_y) and mouse_click[0] == 1:
+            pass  # Implement logic for going back to the menu
+
+        elif quit_rect.collidepoint(mouse_x, mouse_y) and mouse_click[0] == 1:
+            game_over = False
+            working = False
 
 pygame.quit()
