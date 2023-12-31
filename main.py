@@ -294,46 +294,34 @@ while (IsQuit == False):
                 game_over_start_time = current_time
 
             # Drawing Rectangle
-            pygame.draw.rect(window, (255, 0, 0), pygame.Rect(WIDTH // 3 * 2 - 150, HEIGHT // 2 - 150, 300, 400))
+            pygame.draw.rect(window, (0, 0, 0), pygame.Rect(WIDTH - 300, HEIGHT - 400, 300, 400))
 
             # Display game over text with a different font
             game_over_text = button_font.render("Game Over", True, (255, 0, 0))
-            text_rect = game_over_text.get_rect(center=(WIDTH // 3 * 2, HEIGHT // 2 - 50))
+            text_rect = game_over_text.get_rect(center=(WIDTH - 150, HEIGHT - 350))
             window.blit(game_over_text, text_rect)
 
             # Display the score
-            score_text = button_font.render("Score: " + str(SCORE), True, (0, 0, 0))
-            score_rect = score_text.get_rect(center=(WIDTH // 3 * 2, HEIGHT // 2))
+            score_text = button_font.render("Score: " + str(SCORE), True, (255, 255, 255))
+            score_rect = score_text.get_rect(center=(WIDTH -150, HEIGHT -300))
             window.blit(score_text, score_rect)
 
-            # Display buttons with anti-aliased shapes
-            button_color = (0, 0, 0)
-            play_again_rect = pygame.Rect(WIDTH // 3 * 2 - 75, HEIGHT // 2 + 25, 150, 40)
-            play_again_rect.width = 200
-            play_again_rect.height = 60
-            pygame.gfxdraw.aapolygon(window, [(play_again_rect.left, play_again_rect.top),
-                                              (play_again_rect.right, play_again_rect.top),
-                                              (play_again_rect.right, play_again_rect.bottom),
-                                              (play_again_rect.left, play_again_rect.bottom)], button_color)
-            pygame.gfxdraw.filled_polygon(window, [(play_again_rect.left, play_again_rect.top),
-                                                   (play_again_rect.right, play_again_rect.top),
-                                                   (play_again_rect.right, play_again_rect.bottom),
-                                                   (play_again_rect.left, play_again_rect.bottom)], button_color)
+            # Display buttons with black background and white border
+            button_bg_color = (0, 0, 0)  # Black background color
+            button_border_color = (255, 255, 255)  # White border color
+
+            # Play Again Button
+            play_again_rect = pygame.Rect(WIDTH - 250, HEIGHT - 250, 200, 60)
+            pygame.draw.rect(window, button_bg_color, play_again_rect)  # Draw black background
+            pygame.draw.rect(window, button_border_color, play_again_rect, 2)  # Draw white border
             play_again_text = button_font.render("Play Again", True, (255, 255, 255))
             text_rect = play_again_text.get_rect(center=play_again_rect.center)
             window.blit(play_again_text, text_rect)
 
-            quit_rect = pygame.Rect(WIDTH // 3 * 2 - 75, HEIGHT // 2 + 125, 150, 40)
-            quit_rect.height=60
-            quit_rect.width=200
-            pygame.gfxdraw.aapolygon(window, [(quit_rect.left, quit_rect.top),
-                                              (quit_rect.right, quit_rect.top),
-                                              (quit_rect.right, quit_rect.bottom),
-                                              (quit_rect.left, quit_rect.bottom)], button_color)
-            pygame.gfxdraw.filled_polygon(window, [(quit_rect.left, quit_rect.top),
-                                                   (quit_rect.right, quit_rect.top),
-                                                   (quit_rect.right, quit_rect.bottom),
-                                                   (quit_rect.left, quit_rect.bottom)], button_color)
+            # Quit Button
+            quit_rect = pygame.Rect(WIDTH - 250, HEIGHT - 150, 200, 60)
+            pygame.draw.rect(window, button_bg_color, quit_rect)  # Draw black background
+            pygame.draw.rect(window, button_border_color, quit_rect, 2)  # Draw white border
             quit_text = button_font.render("Quit", True, (255, 255, 255))
             text_rect = quit_text.get_rect(center=quit_rect.center)
             window.blit(quit_text, text_rect)

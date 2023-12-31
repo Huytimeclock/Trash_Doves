@@ -76,7 +76,7 @@ class Virus(pygame.sprite.Sprite):
 
             # Check if it's time to disappear
             if self.direction == 'left':
-                if self.rect.x >= 610:
+                if self.rect.x >= 590:
                     self.destroyed = True  # Set destroyed to True when the virus reaches the center
                     self.lose_flag = True  # Set lose_flag to True when the virus is destroyed
 
