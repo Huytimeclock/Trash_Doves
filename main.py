@@ -93,10 +93,12 @@ pipe_speed = 8  # Adjust speed as needed
 max_top_y_pipe=-950
 min_top_y_pipe=-1350
 
+# Define a game over flag
+game_over = False
 # gameloop-------------------------------------------------------------------------------------------------------------
 working = True
 with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2, max_num_hands=2) as hand:
-    while working:
+    while working and not game_over:
         current_time = time.time()
         virus_spawn_time = 2  # Virus spawn
         pipe_spawn_time = 8
@@ -220,8 +222,6 @@ with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2,
             center_point_time_before = current_time
 
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # dontknowwhatthis is
-
-        # Draw camera feed onto the camera surface with 20% opacity
         rgb = np.rot90(rgb)
         frame_surface = pygame.surfarray.make_surface(rgb).convert_alpha()
         frame_surface.set_alpha(camera_alpha)
@@ -236,25 +236,25 @@ with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2,
         if rotated_image_right is not None:
             window.blit(rotated_image_right, new_rect_right)
 
-        # Draw the bird
-        main_bird.draw(window)
+        main_bird.draw(window)        # Draw the bird
+        viruses.draw(window)        # Draw viruses
+        pipes.draw(window)        # Draw pipes
+        bullets.draw(window)  # Draw bullets
 
-        # Draw viruses
-        viruses.draw(window)
-        # Draw pipes
-        pipes.draw(window)
-        # Update viruses and check for reset and creation
-        viruses.update()
-        # Update bullets
-        bullets.update()
-        # Draw bullets
-        bullets.draw(window)
+        viruses.update()        # Update viruses and check for reset and creation
+        bullets.update()        # Update bullets
 
         # Check for collisions between bullets and viruses
         bullet_hits = pygame.sprite.groupcollide(bullets, viruses, True, True)
-        # Increment score for each virus hit
         SCORE += len(bullet_hits)
-        # Add new viruses when the score reaches a certain threshold
+
+        # Check for collisions between bird and pipes
+        if pygame.sprite.spritecollide(main_bird, pipes, False):
+            game_over = True
+
+        # Check for collisions between bird and viruses
+        if pygame.sprite.spritecollide(main_bird, viruses, False):
+            game_over = True
 
         # Draw score and line
         TEXT = default_font.render("Score: " + str(SCORE), True, (0, 0, 0))
@@ -262,6 +262,19 @@ with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2,
         TEXT_COORDINATE.topleft = (20, 20)
         window.blit(TEXT, TEXT_COORDINATE)
         pygame.draw.line(window, (0, 255, 0), (0, 121), (1280, 121), 5)
+        pygame.display.update()
+
+    # Game over logic
+    while game_over:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_over = False
+
+        window.fill((255, 255, 255))  # Clear the window
+        # Display game over text
+        game_over_text = default_font.render("Game Over", True, (255, 0, 0))
+        text_rect = game_over_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        window.blit(game_over_text, text_rect)
         pygame.display.update()
 
 pygame.quit()
