@@ -26,7 +26,7 @@ class Virus(pygame.sprite.Sprite):
         self.randomize_position()
         self.define_angle()
         self.destroyed = False  # Added destroyed attribute
-
+        self.lose_flag = False  # Added lose_flag attribute
 
     def randomize_position(self):
         # Randomize virus position and set direction
@@ -76,20 +76,12 @@ class Virus(pygame.sprite.Sprite):
 
             # Check if it's time to disappear
             if self.direction == 'left':
-                if self.rect.x >= 570:
+                if self.rect.x >= 610:
                     self.destroyed = True  # Set destroyed to True when the virus reaches the center
-                    self.kill()  # Remove the virus from the sprite group
-                    self.game_over = True  # Set game_over to True when the virus is destroyed
-                    self.gameover()
-                    print("lose")
-            else:
-                if self.rect.x <= 570:
-                    self.destroyed = True  # Set destroyed to True when the virus reaches the center
-                    self.kill()  # Remove the virus from the sprite group
-                    self.game_over = True  # Set game_over to True when the virus is destroyed
-                    self.gameover()
-                    print("lose")
+                    self.lose_flag = True  # Set lose_flag to True when the virus is destroyed
 
-    def gameover(self):
-        # Add your game over logic here
-        pass
+            else:
+                if self.rect.x <= 630:
+                    self.destroyed = True  # Set destroyed to True when the virus reaches the center
+                    self.lose_flag = True  # Set lose_flag to True when the virus is destroyed
+

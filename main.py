@@ -139,7 +139,12 @@ while (IsQuit == False):
                 last_pipe_time = current_time
 
             main_bird.update()
-            viruses.update()
+            # Inside your main game loop
+            for virus in viruses:
+                virus.update()
+                if virus.lose_flag:
+                    # The player has lost, add your game over logic here
+                    game_over = True
             pipes.update()
 
             # ------------------------ OPENCV OPERATION
@@ -246,7 +251,7 @@ while (IsQuit == False):
                 window.blit(rotated_image_left, new_rect_left)
             if rotated_image_right is not None:
                 window.blit(rotated_image_right, new_rect_right)
-
+            pygame.draw.line(window, (0, 0, 0), (640, 0), (640, 720), 5)
             main_bird.draw(window)  # Draw the bird
             viruses.draw(window)  # Draw viruses
             pipes.draw(window)  # Draw pipes
@@ -272,7 +277,7 @@ while (IsQuit == False):
             TEXT_COORDINATE = TEXT.get_rect()
             TEXT_COORDINATE.topleft = (20, 20)
             window.blit(TEXT, TEXT_COORDINATE)
-            pygame.draw.line(window, (0, 255, 0), (0, 121), (1280, 121), 5)
+
             pygame.display.update()
 
         # Game over logic
@@ -289,7 +294,7 @@ while (IsQuit == False):
                 game_over_start_time = current_time
 
             # Drawing Rectangle
-            pygame.draw.rect(window, (255, 255, 255), pygame.Rect(WIDTH // 3 * 2 - 150, HEIGHT // 2 - 150, 300, 400))
+            pygame.draw.rect(window, (255, 0, 0), pygame.Rect(WIDTH // 3 * 2 - 150, HEIGHT // 2 - 150, 300, 400))
 
             # Display game over text with a different font
             game_over_text = button_font.render("Game Over", True, (255, 0, 0))
@@ -302,8 +307,10 @@ while (IsQuit == False):
             window.blit(score_text, score_rect)
 
             # Display buttons with anti-aliased shapes
-            button_color = (100, 100, 100)
+            button_color = (0, 0, 0)
             play_again_rect = pygame.Rect(WIDTH // 3 * 2 - 75, HEIGHT // 2 + 25, 150, 40)
+            play_again_rect.width = 200
+            play_again_rect.height = 60
             pygame.gfxdraw.aapolygon(window, [(play_again_rect.left, play_again_rect.top),
                                               (play_again_rect.right, play_again_rect.top),
                                               (play_again_rect.right, play_again_rect.bottom),
@@ -316,7 +323,9 @@ while (IsQuit == False):
             text_rect = play_again_text.get_rect(center=play_again_rect.center)
             window.blit(play_again_text, text_rect)
 
-            quit_rect = pygame.Rect(WIDTH // 3 * 2 - 75, HEIGHT // 2 + 75, 150, 40)
+            quit_rect = pygame.Rect(WIDTH // 3 * 2 - 75, HEIGHT // 2 + 125, 150, 40)
+            quit_rect.height=60
+            quit_rect.width=200
             pygame.gfxdraw.aapolygon(window, [(quit_rect.left, quit_rect.top),
                                               (quit_rect.right, quit_rect.top),
                                               (quit_rect.right, quit_rect.bottom),

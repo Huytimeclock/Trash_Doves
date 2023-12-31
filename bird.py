@@ -26,9 +26,12 @@ class Bird:
         self.on_ground = False
         self.on_top = False
         self.animation_timer = pygame.time.get_ticks()  # Timer to control animation
+        # Load jump sound
+        self.jump_sound = pygame.mixer.Sound("jump.wav")
 
     def jump(self):
-        self.y_speed = self.jump_speed
+        self.y_speed = self.jump_speed        # Play jump sound
+        self.jump_sound.play()
 
     def update(self):
         # Update animation frame every 100 milliseconds
