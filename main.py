@@ -12,7 +12,11 @@ from bullet import Bullet  # Import the Bullet class
 from face import FaceDetector
 from hand import calculate_angle, rotate_image, redefine_angle  # Import hand-related functions
 from pipe import Pipe
+from menu import menu
 
+
+# Run the menu before entering the main game loop
+menu()
 # initialize pygame
 pygame.init()
 clock = pygame.time.Clock()
@@ -106,8 +110,14 @@ game_over_start_time = None
 # gameloop-------------------------------------------------------------------------------------------------------------
 working = True
 IsQuit = False
-while (IsQuit == False):
-    with hand_model.Hands(min_tracking_confidence=0.2, min_detection_confidence=0.2, max_num_hands=2) as hand:
+while (IsQuit == False and working!=False):
+    # Inside the main game loop
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            working = False
+        # Add other event handling logic here
+
+    with hand_model.Hands(min_tracking_confidence=0.5, min_detection_confidence=0.5, max_num_hands=2) as hand:
         while working and not game_over:
             current_time = time.time()
             virus_spawn_time = 2  # Virus spawn
