@@ -17,6 +17,7 @@ from menu import menu
 
 # Run the menu before entering the main game loop
 menu()
+
 # initialize pygame
 pygame.init()
 clock = pygame.time.Clock()
@@ -62,8 +63,7 @@ main_bird = Bird(position=(WIDTH // 2, HEIGHT // 2), jump_speed=-10, gravity=1, 
 
 # Create default font
 default_font = pygame.font.Font(pygame.font.get_default_font(), 36)
-# Load a different font for prettier text
-button_font = pygame.font.Font("Poppins-Light.ttf", 30)
+button_font = pygame.font.Font("Simon Lovely.otf", 30)
 
 # Create a surface for the camera feed
 camera_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
@@ -72,7 +72,7 @@ camera_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 background_image = pygame.image.load("background.png").convert()
 
 # Set opacity (alpha) value for the camera feed and background
-camera_alpha = 255  # 50% opacity (0-255)
+camera_alpha = 255  # 100% opacity (0-255)
 background_alpha = 0  # 20% opacity (0-255)
 
 # Create a sprite group for bullets
@@ -107,6 +107,8 @@ game_over = False
 game_over_bg = None
 game_over_sound_played = False
 game_over_start_time = None
+
+
 # gameloop-------------------------------------------------------------------------------------------------------------
 working = True
 IsQuit = False
@@ -115,7 +117,7 @@ while (IsQuit == False and working!=False):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             working = False
-        # Add other event handling logic here
+
 
     with hand_model.Hands(min_tracking_confidence=0.5, min_detection_confidence=0.5, max_num_hands=2) as hand:
         while working and not game_over:
@@ -247,7 +249,7 @@ while (IsQuit == False and working!=False):
                 center_point_before = center_point
                 center_point_time_before = current_time
 
-            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # dontknowwhatthis is
+            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             rgb = np.rot90(rgb)
             frame_surface = pygame.surfarray.make_surface(rgb).convert_alpha()
             frame_surface.set_alpha(camera_alpha)
@@ -272,7 +274,9 @@ while (IsQuit == False and working!=False):
 
             # Check for collisions between bullets and viruses
             bullet_hits = pygame.sprite.groupcollide(bullets, viruses, True, True)
-            SCORE += len(bullet_hits)
+            if bullet_hits:
+                SCORE += len(bullet_hits)
+                destroying_virus.play()
 
             # Check for collisions between bird and pipes
             if pygame.sprite.spritecollide(main_bird, pipes, False):
