@@ -34,7 +34,7 @@ window = pygame.display.set_mode((WIDTH, HEIGHT))
 face_detector = FaceDetector()
 
 # background music
-pygame.mixer.music.load("bg-music.wav")
+pygame.mixer.music.load("gamebgm.ogg")
 pygame.mixer.music.play(-1, 0, 0)
 destroying_virus = pygame.mixer.Sound("collect.wav")
 deathsound = pygame.mixer.Sound("death.wav")
@@ -336,6 +336,7 @@ while (IsQuit == False and working!=False):
             text_rect = quit_text.get_rect(center=quit_rect.center)
             window.blit(quit_text, text_rect)
 
+
             pygame.display.update()
 
             # Check for button clicks
@@ -353,6 +354,7 @@ while (IsQuit == False and working!=False):
                 game_over = False
                 game_over_sound_played = False
                 game_over_start_time = None
+
 
             elif quit_rect.collidepoint(mouse_x, mouse_y) and mouse_click[0] == 1:
                 game_over = False

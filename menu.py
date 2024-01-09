@@ -15,6 +15,15 @@ font = pygame.font.Font(None, 36)
 
 # Load background image
 background_image = pygame.image.load("background.png").convert()
+# Resize the background image to match the screen dimensions
+background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
+
+
+# Load background music
+pygame.mixer.music.load("bgm.mp3")
+pygame.mixer.music.set_volume(0.5)
+pygame.mixer.music.play(-1)
+
 
 # Load images
 image_list = [pygame.image.load(f"f{i}.png") for i in range(4)]
