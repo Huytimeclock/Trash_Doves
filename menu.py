@@ -4,6 +4,11 @@ import sys
 # Initialize pygame
 pygame.init()
 
+# Load the OTF font
+otf_font = "Simon Lovely.otf"  # Replace with the path to your OTF font file
+font_size = 72
+custom_font = pygame.font.Font(otf_font, font_size)
+
 # Set up the window
 WIDTH, HEIGHT = 1280, 720
 window = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -12,18 +17,15 @@ pygame.display.set_caption("Trash Doves")
 # Create font
 font = pygame.font.Font(None, 36)
 
-
 # Load background image
 background_image = pygame.image.load("background.png").convert()
 # Resize the background image to match the screen dimensions
 background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
-
 # Load background music
 pygame.mixer.music.load("bgm.mp3")
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1)
-
 
 # Load images
 image_list = [pygame.image.load(f"f{i}.png") for i in range(4)]
@@ -35,16 +37,27 @@ transition_time = 250  # Time in milliseconds for each transition phase
 transition_alpha = 0  # Alpha value for screen fade (0 = fully transparent, 255 = fully opaque)
 transition_phase = "FADE_IN"  # Initial transition phase
 
+# Modify the bird size
+bird_size = 2  # Double the size
+bird_image = pygame.image.load("bird.png")  # Replace with your bird image
+bird_image = pygame.transform.scale(bird_image, (bird_image.get_width() * bird_size, bird_image.get_height() * bird_size))
+bird_rect = bird_image.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+
 def draw_text(text, font, color, x, y):
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect(center=(x, y))
     window.blit(text_surface, text_rect)
 
+def fancy_button(surface, rect, color, text, font, text_color):
+    pygame.draw.rect(surface, color, rect)
+    pygame.draw.rect(surface, (255, 255, 255), rect, 5)  # White border
+    draw_text(text, font, text_color, rect.centerx, rect.centery)
+
 def menu():
     global current_frame, transition_alpha, transition_phase
     clock = pygame.time.Clock()
 
-    play_button_rect = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2, 200, 50)
+    play_button_rect = pygame.Rect(WIDTH // 2 - 150, HEIGHT // 2 + 100, 300, 100)
 
     while True:
         for event in pygame.event.get():
@@ -59,12 +72,16 @@ def menu():
         # Fill the window with the background color/image
         window.blit(background_image, (0, 0))
 
-        # Draw the game name
-        draw_text("Trash Doves", font, (255, 255, 255), WIDTH // 2, HEIGHT // 4)
+        # Render text using the OTF font
+        text = custom_font.render("Trash Doves", True, (255, 255, 255))
+        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 4))
+        window.blit(text, text_rect)
 
-        # Draw the play button
-        pygame.draw.rect(window, (7, 94, 166), play_button_rect)  # Green play button
-        draw_text("Play", font, (255, 255, 255), WIDTH // 2, HEIGHT // 2 + 25)
+        # Draw the double-sized bird
+        window.blit(bird_image, bird_rect)
+
+        # Draw the fancy play button
+        fancy_button(window, play_button_rect, (14, 36, 71), "Play", custom_font, (255, 255, 255))
 
         # Draw the current frame image above the play button
         current_image = image_list[current_frame]
